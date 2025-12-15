@@ -45,6 +45,7 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {currentPage === 'games' && (
+        <>
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border">
         <div className="px-3 py-2.5 flex items-center justify-between max-w-screen-xl mx-auto">
           <div className="flex items-center gap-1.5">
@@ -122,6 +123,7 @@ export default function Index() {
           <p className="text-muted-foreground text-sm">Выберите категорию игр в меню выше</p>
         </div>
       </div>
+      </>
       )}
 
       {currentPage === 'profile' && (
