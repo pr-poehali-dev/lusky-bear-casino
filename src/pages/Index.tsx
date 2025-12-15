@@ -27,7 +27,8 @@ const PAYMENT_METHODS = [
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState('all');
-  const [balance, setBalance] = useState(4000);
+  const [currentPage, setCurrentPage] = useState('games');
+  const [balance, setBalance] = useState(4);
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [amount, setAmount] = useState('');
@@ -43,6 +44,7 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      {currentPage === 'games' && (
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border">
         <div className="px-3 py-2.5 flex items-center justify-between max-w-screen-xl mx-auto">
           <div className="flex items-center gap-1.5">
@@ -120,10 +122,117 @@ export default function Index() {
           <p className="text-muted-foreground text-sm">Выберите категорию игр в меню выше</p>
         </div>
       </div>
+      )}
+
+      {currentPage === 'profile' && (
+        <div className="px-3 py-6 max-w-screen-xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            <button className="flex items-center gap-1.5 bg-card border border-border rounded-xl px-3 py-2">
+              <span className="text-2xl">🇷🇺</span>
+              <span className="text-sm font-medium">Russia</span>
+              <Icon name="ChevronDown" size={16} className="text-muted-foreground" />
+            </button>
+          </div>
+
+          <div className="text-center mb-8">
+            <div className="inline-block relative mb-4">
+              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary via-blue-400 to-cyan-400 flex items-center justify-center shadow-2xl shadow-primary/50">
+                <Icon name="Star" size={64} className="text-white" />
+              </div>
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-background border-2 border-primary rounded-full px-4 py-1">
+                <span className="text-3xl font-bold">LV.3</span>
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold mb-1">Серия-dy</h2>
+            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <span className="text-sm">UID:1704028377</span>
+              <Icon name="Copy" size={14} />
+            </div>
+            <Button className="mt-4 bg-accent hover:bg-accent/90 text-accent-foreground rounded-full px-6">
+              Посмотреть привилегии
+            </Button>
+          </div>
+
+          <Card className="bg-card border-border p-5 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
+                  <Icon name="Coins" size={20} className="text-white" />
+                </div>
+                <span className="text-3xl font-bold">{balance}</span>
+              </div>
+              <a href="#" className="text-primary text-sm">История ставок</a>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                  <span>Доступно для вывода</span>
+                  <Icon name="HelpCircle" size={12} />
+                </div>
+                <div className="text-green-500 font-semibold">{balance}₽ ></div>
+              </div>
+              <div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                  <span>Сумма к разблокировке</span>
+                  <Icon name="HelpCircle" size={12} />
+                </div>
+                <div className="text-primary font-semibold">0₽ ></div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between bg-secondary rounded-lg p-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Icon name="HelpCircle" size={16} />
+                <span>Остаток средств: 0₽</span>
+              </div>
+              <Icon name="ChevronRight" size={18} className="text-muted-foreground" />
+            </div>
+          </Card>
+
+          <div className="flex gap-3 mb-6">
+            <Button 
+              onClick={() => setShowDepositModal(true)}
+              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground py-6 rounded-2xl text-base font-semibold"
+            >
+              <Icon name="DollarSign" size={20} className="mr-2" />
+              Пополнить
+            </Button>
+            <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-6 rounded-2xl text-base font-semibold">
+              <Icon name="ArrowUpRight" size={20} className="mr-2" />
+              Вывести
+            </Button>
+          </div>
+
+          <Card className="bg-card border-border p-5">
+            <h3 className="text-xl font-bold mb-4">Акция пополнения</h3>
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-3 text-center text-xs text-muted-foreground mb-2">
+                <div>Сумма пополнения</div>
+                <div>Процент бонуса</div>
+                <div>Бонусная сумма</div>
+              </div>
+              <div className="grid grid-cols-3 gap-3 text-center py-3 border-t border-border">
+                <div className="font-semibold">300₽</div>
+                <div className="font-semibold">120%</div>
+                <div className="text-accent font-bold">360₽</div>
+              </div>
+              <div className="grid grid-cols-3 gap-3 text-center py-3 border-t border-border">
+                <div className="font-semibold">1 000₽</div>
+                <div className="font-semibold">180%</div>
+                <div className="text-accent font-bold">1 800₽</div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
 
       <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur border-t border-border z-50">
         <div className="flex items-center justify-around py-2 px-2 max-w-screen-xl mx-auto">
-          <button className="flex flex-col items-center gap-0.5 text-primary min-w-0 flex-1">
+          <button 
+            onClick={() => setCurrentPage('games')}
+            className={`flex flex-col items-center gap-0.5 min-w-0 flex-1 ${currentPage === 'games' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+          >
             <Icon name="Gamepad2" size={22} />
             <span className="text-[10px] font-medium">Игры</span>
           </button>
@@ -142,7 +251,10 @@ export default function Index() {
             <Icon name="Wallet" size={22} />
             <span className="text-[10px]">Счёт</span>
           </button>
-          <button className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-foreground min-w-0 flex-1">
+          <button 
+            onClick={() => setCurrentPage('profile')}
+            className={`flex flex-col items-center gap-0.5 min-w-0 flex-1 ${currentPage === 'profile' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+          >
             <Icon name="User" size={22} />
             <span className="text-[10px]">Профиль</span>
           </button>
