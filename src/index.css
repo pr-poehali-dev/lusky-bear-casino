@@ -67,6 +67,15 @@
     animation: fade-in 0.3s ease-out;
   }
 
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   @keyframes fade-in {
     from {
       opacity: 0;
