@@ -121,11 +121,11 @@ export default function Index() {
         <div className="px-3 py-2.5 flex items-center justify-between max-w-screen-xl mx-auto">
           <div className="flex items-center gap-1.5">
             <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center">
-              <span className="text-xl">🐻</span>
+              <span className="text-xl">🎮</span>
             </div>
             <div>
-              <h1 className="text-base font-bold text-primary leading-tight">LUCKY</h1>
-              <h2 className="text-[10px] text-foreground font-semibold leading-tight">BEAR</h2>
+              <h1 className="text-base font-bold text-primary leading-tight">JUST</h1>
+              <h2 className="text-[10px] text-foreground font-semibold leading-tight">GAMES</h2>
             </div>
           </div>
 
@@ -191,7 +191,7 @@ export default function Index() {
         <div className="space-y-6">
           <Card className="bg-gradient-to-br from-primary/20 to-accent/20 border-primary/30 p-6 text-center">
             <div className="text-5xl mb-3">🎰</div>
-            <h3 className="text-xl font-semibold mb-2">Добро пожаловать в Lucky Bear</h3>
+            <h3 className="text-xl font-semibold mb-2">Добро пожаловать в Just Games</h3>
             <p className="text-sm text-muted-foreground">Выберите категорию игр в меню выше</p>
           </Card>
 
