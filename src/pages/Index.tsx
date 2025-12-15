@@ -44,7 +44,12 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>(null);
   const [amount, setAmount] = useState('');
+  const [phone, setPhone] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [walletId, setWalletId] = useState('');
+  const [applyBonus, setApplyBonus] = useState(true);
   const [transactions, setTransactions] = useState<any[]>([]);
   const userId = getUserId();
 
@@ -550,16 +555,19 @@ export default function Index() {
                   </h4>
                   <div className="space-y-2">
                     {[
-                      { icon: '✓', name: 'Перевод со Сбербанка', range: 'От 1 077₽ до 300 000₽', badge: 'HOT' },
-                      { icon: '🏦', name: 'Перевод с Т-банка', range: 'От 1 077₽ до 300 000₽' },
-                      { icon: '🅰️', name: 'Перевод с Альфа-банка', range: 'От 1 077₽ до 300 000₽' },
-                      { icon: '💳', name: 'Перевод через ВТБ', range: 'От 1 077₽ до 300 000₽' },
-                      { icon: '📱', name: 'Перевод по номеру', range: 'От 2 077₽ до 300 000₽' },
-                      { icon: '💳', name: 'Перевод по номеру карты', range: 'От 3 077₽ до 300 000₽' },
+                      { id: 'sber', icon: '✓', name: 'Перевод со Сбербанка', range: 'От 1 077₽ до 300 000₽', min: 1077, type: 'phone', badge: 'HOT' },
+                      { id: 'tbank', icon: '🏦', name: 'Перевод с Т-банка', range: 'От 1 077₽ до 300 000₽', min: 1077, type: 'phone' },
+                      { id: 'alfa', icon: '🅰️', name: 'Перевод с Альфа-банка', range: 'От 1 077₽ до 300 000₽', min: 1077, type: 'phone' },
+                      { id: 'vtb', icon: '💳', name: 'Перевод через ВТБ', range: 'От 1 077₽ до 300 000₽', min: 1077, type: 'phone' },
+                      { id: 'phone', icon: '📱', name: 'Перевод по номеру', range: 'От 1 077₽ до 300 000₽', min: 1077, type: 'phone' },
+                      { id: 'card', icon: '💳', name: 'Перевод по номеру карты', range: 'От 2 200₽ до 300 000₽', min: 2200, type: 'card' },
                     ].map((method, idx) => (
                       <button
                         key={idx}
-                        onClick={() => setShowDepositModal(true)}
+                        onClick={() => {
+                          setSelectedPaymentMethod(method);
+                          setCurrentPage('payment-form');
+                        }}
                         className="w-full flex items-center gap-3 bg-secondary/50 hover:bg-secondary rounded-lg p-3 transition-colors relative"
                       >
                         {method.badge && (
@@ -591,11 +599,15 @@ export default function Index() {
                   </p>
                   <div className="space-y-2">
                     {[
-                      { icon: '📱', name: '@CryptoBot', range: 'От 20USDT до 2 000USDT' },
-                      { icon: '💎', name: 'USDT (TON)', range: 'От 20USDT до 2 000USDT', badge: 'FREE' },
+                      { id: 'cryptobot', icon: '📱', name: '@CryptoBot', range: 'От 10USDT до 5 000USDT', min: 10, type: 'crypto' },
+                      { id: 'usdt', icon: '💎', name: 'USDT (TON)', range: 'От 20USDT до 2 000USDT', min: 20, type: 'crypto', badge: 'FREE' },
                     ].map((method, idx) => (
                       <button
                         key={idx}
+                        onClick={() => {
+                          setSelectedPaymentMethod(method);
+                          setCurrentPage('payment-form');
+                        }}
                         className="w-full flex items-center gap-3 bg-secondary/50 hover:bg-secondary rounded-lg p-3 transition-colors relative"
                       >
                         {method.badge && (
@@ -637,12 +649,16 @@ export default function Index() {
                   <h4 className="font-semibold mb-3">Оплатить в рублях</h4>
                   <div className="space-y-2">
                     {[
-                      { icon: '📱', name: 'Перевод по номеру', range: 'От 2 200₽ до 200 000₽', badge: 'HOT' },
-                      { icon: '💳', name: 'Перевод по номеру карты', range: 'От 3 300₽ до 200 000₽' },
-                      { icon: '🎨', name: 'piastrix', range: 'От 2 200₽ до 100 000₽' },
+                      { id: 'phone-withdraw', icon: '📱', name: 'Перевод по номеру', range: 'От 2 200₽ до 200 000₽', min: 2200, type: 'phone', badge: 'HOT' },
+                      { id: 'card-withdraw', icon: '💳', name: 'Перевод по номеру карты', range: 'От 2 200₽ до 200 000₽', min: 2200, type: 'card' },
+                      { id: 'piastrix', icon: '🎨', name: 'piastrix', range: 'От 2 200₽ до 100 000₽', min: 2200, type: 'wallet' },
                     ].map((method, idx) => (
                       <button
                         key={idx}
+                        onClick={() => {
+                          setSelectedPaymentMethod(method);
+                          setCurrentPage('payment-form');
+                        }}
                         className="w-full flex items-center gap-3 bg-secondary/50 hover:bg-secondary rounded-lg p-3 transition-colors relative"
                       >
                         {method.badge && (
@@ -671,11 +687,15 @@ export default function Index() {
                   </p>
                   <div className="space-y-2">
                     {[
-                      { icon: '📱', name: '@CryptoBot', range: 'От 20USDT до 2 000USDT' },
-                      { icon: '💎', name: 'USDT (TON)', range: 'От 20USDT до 2 000USDT' },
+                      { id: 'cryptobot-withdraw', icon: '📱', name: '@CryptoBot', range: 'От 20USDT до 2 000USDT', min: 20, type: 'crypto' },
+                      { id: 'usdt-withdraw', icon: '💎', name: 'USDT (TON)', range: 'От 20USDT до 2 000USDT', min: 20, type: 'crypto' },
                     ].map((method, idx) => (
                       <button
                         key={idx}
+                        onClick={() => {
+                          setSelectedPaymentMethod(method);
+                          setCurrentPage('payment-form');
+                        }}
                         className="w-full flex items-center gap-3 bg-secondary/50 hover:bg-secondary rounded-lg p-3 transition-colors"
                       >
                         <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center text-2xl">
@@ -730,6 +750,258 @@ export default function Index() {
                 )}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {currentPage === 'payment-form' && selectedPaymentMethod && (
+        <div className="min-h-screen bg-background pb-20">
+          <header className="sticky top-0 z-50 bg-background border-b border-border">
+            <div className="px-3 py-4">
+              <div className="flex items-center gap-3 mb-4">
+                <button onClick={() => setCurrentPage('wallet')} className="p-2">
+                  <Icon name="ArrowLeft" size={24} />
+                </button>
+                <h1 className="text-xl font-semibold">Пополнение через {selectedPaymentMethod.name}</h1>
+              </div>
+
+              <Card className="bg-card border-border p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-16 bg-secondary rounded-lg flex items-center justify-center text-3xl">
+                    {selectedPaymentMethod.icon}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold">{selectedPaymentMethod.name}</p>
+                    <p className="text-sm text-muted-foreground">{selectedPaymentMethod.range}</p>
+                  </div>
+                </div>
+              </Card>
+
+              {selectedPaymentMethod.type !== 'crypto' && (
+                <Card className="bg-primary/10 border-primary/30 p-3 mt-3">
+                  <div className="flex items-center gap-2">
+                    <div className="text-2xl">💡</div>
+                    <p className="text-xs">Чем больше пополняешь счёт, тем больше открывается бонусов</p>
+                  </div>
+                </Card>
+              )}
+
+              {selectedPaymentMethod.type === 'crypto' && (
+                <Card className="bg-blue-500/10 border-blue-500/30 p-3 mt-3">
+                  <div className="flex items-center gap-2">
+                    <div className="text-2xl">💡</div>
+                    <p className="text-xs">Лидер среди криптокошельков в русскоязычном пространстве</p>
+                    <Icon name="HelpCircle" size={16} className="text-blue-400" />
+                  </div>
+                </Card>
+              )}
+            </div>
+          </header>
+
+          <div className="px-3 py-4">
+            <h3 className="font-semibold mb-3">Заплатите <span className="text-muted-foreground text-sm ml-2">Мин. сумма: {selectedPaymentMethod.type === 'crypto' ? `${selectedPaymentMethod.min}USDT` : `${selectedPaymentMethod.min}₽`}</span></h3>
+
+            <div className="mb-4">
+              <div className="flex items-center gap-2 bg-card border-2 border-border rounded-lg p-4 mb-3">
+                <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
+                  <Icon name="Coins" size={20} className="text-white" />
+                </div>
+                <span className="text-sm text-muted-foreground mr-2">{selectedPaymentMethod.type === 'crypto' ? 'USDT' : 'RUB'}</span>
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder={selectedPaymentMethod.type === 'crypto' ? '50' : '3077'}
+                  className="flex-1 bg-transparent text-3xl font-bold outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                {selectedPaymentMethod.type === 'crypto' ? (
+                  <>
+                    <button onClick={() => setAmount('10')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
+                      <p className="font-bold">10USDT</p>
+                      <p className="text-xs text-green-500">+12USDT</p>
+                    </button>
+                    <button onClick={() => setAmount('50')} className="bg-green-600/20 border-2 border-green-600 hover:bg-green-600/30 rounded-lg p-3 transition-colors">
+                      <p className="font-bold">50USDT</p>
+                      <p className="text-xs text-green-500">+150USDT</p>
+                    </button>
+                    <button onClick={() => setAmount('100')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
+                      <p className="font-bold">100USDT</p>
+                      <p className="text-xs text-green-500">+300USDT</p>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => setAmount('2077')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
+                      <p className="font-bold">2 077₽</p>
+                      <p className="text-xs text-green-500">+4 984₽</p>
+                    </button>
+                    <button onClick={() => setAmount('3077')} className="bg-green-600/20 border-2 border-green-600 hover:bg-green-600/30 rounded-lg p-3 transition-colors">
+                      <p className="font-bold">3 077₽</p>
+                      <p className="text-xs text-green-500">+9 231₽</p>
+                    </button>
+                    <button onClick={() => setAmount('5077')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
+                      <p className="font-bold">5 077₽</p>
+                      <p className="text-xs text-green-500">+15 231₽</p>
+                    </button>
+                  </>
+                )}
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                {selectedPaymentMethod.type === 'crypto' ? (
+                  <>
+                    <button onClick={() => setAmount('500')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
+                      <p className="font-bold">500USDT</p>
+                      <p className="text-xs text-green-500">+1 800USDT</p>
+                    </button>
+                    <button onClick={() => setAmount('1000')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
+                      <p className="font-bold">1 000USDT</p>
+                      <p className="text-xs text-green-500">+3 600USDT</p>
+                    </button>
+                    <button onClick={() => setAmount('5000')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
+                      <p className="font-bold">5 000USDT</p>
+                      <p className="text-xs text-green-500">+18 000USDT</p>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => setAmount('8077')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
+                      <p className="font-bold">8 077₽</p>
+                      <p className="text-xs text-green-500">+24 231₽</p>
+                    </button>
+                    <button onClick={() => setAmount('10077')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
+                      <p className="font-bold">10 077₽</p>
+                      <p className="text-xs text-green-500">+34 261₽</p>
+                    </button>
+                    <button onClick={() => setAmount('20000')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
+                      <p className="font-bold">20 000₽</p>
+                      <p className="text-xs text-green-500">+72 000₽</p>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <Card className="bg-card border-border p-4 mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="text-2xl">🎁</div>
+                  <div>
+                    <p className="font-semibold text-sm">Вы получите</p>
+                    <p className="text-xs text-muted-foreground">Бонус</p>
+                  </div>
+                </div>
+                <span className="bg-primary text-primary-foreground text-sm font-bold px-3 py-1 rounded-full">+300%</span>
+              </div>
+              <div className="flex items-center justify-between bg-secondary rounded-lg p-3">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm">Бонус + 300%</p>
+                  <Icon name="HelpCircle" size={14} className="text-muted-foreground" />
+                </div>
+                <button onClick={() => setApplyBonus(!applyBonus)}>
+                  <div className={`w-6 h-6 rounded ${applyBonus ? 'bg-primary' : 'bg-secondary border-2 border-border'} flex items-center justify-center`}>
+                    {applyBonus && <Icon name="Check" size={16} className="text-white" />}
+                  </div>
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Нажмите на чекбокс, чтобы получить доп. награды за пополнение 300% {selectedPaymentMethod.type === 'crypto' ? 'USDT' : '₽'}.
+              </p>
+              <button className="text-primary text-xs mt-1 hover:underline">Подробности смотрите в правилах</button>
+            </Card>
+
+            {selectedPaymentMethod.type === 'phone' && (
+              <div className="mb-4">
+                <label className="text-sm font-semibold mb-2 block">Номер телефона</label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+7 (___) ___-__-__"
+                  className="w-full px-4 py-3 bg-card border-2 border-border rounded-lg focus:border-primary outline-none"
+                />
+              </div>
+            )}
+
+            {selectedPaymentMethod.type === 'card' && (
+              <div className="mb-4">
+                <label className="text-sm font-semibold mb-2 block">Номер карты</label>
+                <input
+                  type="text"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(e.target.value)}
+                  placeholder="____ ____ ____ ____"
+                  maxLength={19}
+                  className="w-full px-4 py-3 bg-card border-2 border-border rounded-lg focus:border-primary outline-none"
+                />
+              </div>
+            )}
+
+            {selectedPaymentMethod.type === 'crypto' && (
+              <div className="mb-4">
+                <label className="text-sm font-semibold mb-2 block">ID кошелька</label>
+                <input
+                  type="text"
+                  value={walletId}
+                  onChange={(e) => setWalletId(e.target.value)}
+                  placeholder="Введите ID вашего крипто-кошелька"
+                  className="w-full px-4 py-3 bg-card border-2 border-border rounded-lg focus:border-primary outline-none"
+                />
+              </div>
+            )}
+
+            <Button
+              onClick={async () => {
+                const depositAmount = Number(amount);
+                if (!depositAmount || depositAmount < selectedPaymentMethod.min) {
+                  alert(`Минимальная сумма: ${selectedPaymentMethod.min}${selectedPaymentMethod.type === 'crypto' ? 'USDT' : '₽'}`);
+                  return;
+                }
+                
+                if (selectedPaymentMethod.type === 'phone' && !phone) {
+                  alert('Введите номер телефона');
+                  return;
+                }
+                
+                if (selectedPaymentMethod.type === 'card' && !cardNumber) {
+                  alert('Введите номер карты');
+                  return;
+                }
+                
+                if (selectedPaymentMethod.type === 'crypto' && !walletId) {
+                  alert('Введите ID кошелька');
+                  return;
+                }
+
+                const bonusMultiplier = applyBonus ? 4 : 1;
+                const finalAmount = depositAmount * bonusMultiplier;
+                
+                await updateBalance(
+                  finalAmount,
+                  'deposit',
+                  'payment',
+                  `Пополнение через ${selectedPaymentMethod.name}: ${depositAmount}${selectedPaymentMethod.type === 'crypto' ? 'USDT' : '₽'}`
+                );
+                
+                setCurrentPage('wallet');
+                setAmount('');
+                setPhone('');
+                setCardNumber('');
+                setWalletId('');
+                setSelectedPaymentMethod(null);
+              }}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-5 rounded-2xl text-lg font-bold"
+            >
+              Пополнить баланс
+              {amount && (
+                <span className="ml-2">
+                  Баланс пополнен на {applyBonus ? Number(amount) * 4 : amount}{selectedPaymentMethod.type === 'crypto' ? 'USDT' : '₽'}
+                </span>
+              )}
+            </Button>
           </div>
         </div>
       )}
