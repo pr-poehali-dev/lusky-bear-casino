@@ -1,0 +1,41 @@
+{
+  "tests": [
+    {
+      "name": "Get user balance",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "test_user_123"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "user": {
+          "user_id": "string",
+          "balance": "number"
+        }
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Update balance with bet",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "test_user_123"
+      },
+      "body": {
+        "amount": -100,
+        "type": "bet",
+        "game_type": "slot",
+        "description": "Slot game bet"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "balance": "number",
+        "amount": -100,
+        "type": "bet"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

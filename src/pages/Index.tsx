@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
@@ -25,17 +25,88 @@ const PAYMENT_METHODS = [
   { id: 'mobile', name: 'Мобильный платеж', icon: 'Smartphone' },
 ];
 
+const BALANCE_API = 'https://functions.poehali.dev/f94f1e9d-6e4d-4cb4-a2b2-2c71098604c4';
+
+const getUserId = () => {
+  let userId = localStorage.getItem('lucky_bear_user_id');
+  if (!userId) {
+    userId = 'user_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('lucky_bear_user_id', userId);
+  }
+  return userId;
+};
+
 export default function Index() {
   const [activeTab, setActiveTab] = useState('all');
   const [currentPage, setCurrentPage] = useState('games');
-  const [balance, setBalance] = useState(4);
+  const [balance, setBalance] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [amount, setAmount] = useState('');
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const userId = getUserId();
 
-  const handleDeposit = () => {
+  useEffect(() => {
+    loadBalance();
+  }, []);
+
+  const loadBalance = async () => {
+    try {
+      const response = await fetch(BALANCE_API, {
+        headers: {
+          'X-User-Id': userId
+        }
+      });
+      const data = await response.json();
+      setBalance(data.user.balance);
+      setTransactions(data.transactions);
+    } catch (error) {
+      console.error('Failed to load balance:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateBalance = async (amount: number, type: string, gameType: string, description: string) => {
+    try {
+      const response = await fetch(BALANCE_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Id': userId
+        },
+        body: JSON.stringify({
+          amount,
+          type,
+          game_type: gameType,
+          description
+        })
+      });
+      const data = await response.json();
+      setBalance(data.balance);
+      await loadBalance();
+    } catch (error) {
+      console.error('Failed to update balance:', error);
+    }
+  };
+
+  const playGame = async (gameTitle: string, gameType: string) => {
+    const betAmount = -100;
+    await updateBalance(betAmount, 'bet', gameType, `Ставка в игре ${gameTitle}`);
+    
+    setTimeout(async () => {
+      const isWin = Math.random() > 0.5;
+      if (isWin) {
+        const winAmount = Math.floor(Math.random() * 300) + 150;
+        await updateBalance(winAmount, 'win', gameType, `Выигрыш в игре ${gameTitle}`);
+      }
+    }, 2000);
+  };
+
+  const handleDeposit = async () => {
     if (amount && selectedMethod) {
-      setBalance(balance + Number(amount));
+      await updateBalance(Number(amount), 'deposit', 'payment', `Пополнение через ${selectedMethod}`);
       setShowDepositModal(false);
       setAmount('');
       setSelectedMethod(null);
@@ -117,10 +188,62 @@ export default function Index() {
           </Button>
         </div>
 
-        <div className="text-center py-20">
-          <div className="text-6xl mb-4">🎰</div>
-          <h3 className="text-xl font-semibold mb-2 text-foreground">Добро пожаловать в Lucky Bear</h3>
-          <p className="text-muted-foreground text-sm">Выберите категорию игр в меню выше</p>
+        <div className="space-y-6">
+          <Card className="bg-gradient-to-br from-primary/20 to-accent/20 border-primary/30 p-6 text-center">
+            <div className="text-5xl mb-3">🎰</div>
+            <h3 className="text-xl font-semibold mb-2">Добро пожаловать в Lucky Bear</h3>
+            <p className="text-sm text-muted-foreground mb-4">Попробуйте удачу в демо-играх</p>
+            <div className="grid grid-cols-2 gap-3">
+              {GAMES.slots.slice(0, 2).map((game) => (
+                <Button
+                  key={game.id}
+                  onClick={() => playGame(game.title, 'slots')}
+                  disabled={loading || balance < 100}
+                  className="bg-card hover:bg-card/80 text-foreground border border-border h-auto py-3"
+                >
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-lg">🎲</span>
+                    <span className="text-xs font-medium">{game.title}</span>
+                    <span className="text-xs text-muted-foreground">Ставка: 100₽</span>
+                  </div>
+                </Button>
+              ))}
+            </div>
+          </Card>
+
+          {transactions.length > 0 && (
+            <Card className="bg-card border-border p-4">
+              <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <Icon name="History" size={16} />
+                Последние транзакции
+              </h4>
+              <div className="space-y-2">
+                {transactions.slice(0, 5).map((tx: any) => (
+                  <div key={tx.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        tx.transaction_type === 'win' ? 'bg-green-500/20' :
+                        tx.transaction_type === 'deposit' ? 'bg-primary/20' : 'bg-red-500/20'
+                      }`}>
+                        <Icon 
+                          name={tx.transaction_type === 'win' ? 'TrendingUp' : tx.transaction_type === 'deposit' ? 'Wallet' : 'TrendingDown'} 
+                          size={16}
+                          className={tx.transaction_type === 'win' ? 'text-green-500' : tx.transaction_type === 'deposit' ? 'text-primary' : 'text-red-500'}
+                        />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium">{tx.description}</p>
+                        <p className="text-[10px] text-muted-foreground">{new Date(tx.created_at).toLocaleString('ru-RU')}</p>
+                      </div>
+                    </div>
+                    <span className={`text-sm font-semibold ${tx.amount > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      {tx.amount > 0 ? '+' : ''}{tx.amount}₽
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
         </div>
       </div>
       </>
@@ -163,7 +286,12 @@ export default function Index() {
                 </div>
                 <span className="text-3xl font-bold">{balance}</span>
               </div>
-              <a href="#" className="text-primary text-sm">История ставок</a>
+              <button 
+                onClick={() => setCurrentPage('games')}
+                className="text-primary text-sm hover:underline"
+              >
+                История ставок
+              </button>
             </div>
             
             <div className="grid grid-cols-2 gap-4 mb-4">
