@@ -305,7 +305,10 @@ export default function Index() {
               <Icon name="DollarSign" size={20} className="mr-2" />
               Пополнить
             </Button>
-            <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-6 rounded-2xl text-base font-semibold">
+            <Button 
+              onClick={() => setCurrentPage('withdrawal')}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white py-6 rounded-2xl text-base font-semibold"
+            >
               <Icon name="ArrowUpRight" size={20} className="mr-2" />
               Вывести
             </Button>
