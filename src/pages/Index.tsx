@@ -306,7 +306,10 @@ export default function Index() {
               Пополнить
             </Button>
             <Button 
-              onClick={() => setCurrentPage('withdrawal')}
+              onClick={() => {
+                setWalletPage('withdraw');
+                setCurrentPage('wallet');
+              }}
               className="flex-1 bg-green-600 hover:bg-green-700 text-white py-6 rounded-2xl text-base font-semibold"
             >
               <Icon name="ArrowUpRight" size={20} className="mr-2" />
