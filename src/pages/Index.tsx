@@ -192,23 +192,7 @@ export default function Index() {
           <Card className="bg-gradient-to-br from-primary/20 to-accent/20 border-primary/30 p-6 text-center">
             <div className="text-5xl mb-3">🎰</div>
             <h3 className="text-xl font-semibold mb-2">Добро пожаловать в Lucky Bear</h3>
-            <p className="text-sm text-muted-foreground mb-4">Попробуйте удачу в демо-играх</p>
-            <div className="grid grid-cols-2 gap-3">
-              {GAMES.slots.slice(0, 2).map((game) => (
-                <Button
-                  key={game.id}
-                  onClick={() => playGame(game.title, 'slots')}
-                  disabled={loading || balance < 100}
-                  className="bg-card hover:bg-card/80 text-foreground border border-border h-auto py-3"
-                >
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-lg">🎲</span>
-                    <span className="text-xs font-medium">{game.title}</span>
-                    <span className="text-xs text-muted-foreground">Ставка: 100₽</span>
-                  </div>
-                </Button>
-              ))}
-            </div>
+            <p className="text-sm text-muted-foreground">Выберите категорию игр в меню выше</p>
           </Card>
 
           {transactions.length > 0 && (

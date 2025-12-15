@@ -45,7 +45,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             if not user:
                 cur.execute(
-                    "INSERT INTO users (user_id, balance, level, nickname) VALUES (%s, 4000, 3, 'Серия-dy') RETURNING *",
+                    "INSERT INTO users (user_id, balance, level, nickname) VALUES (%s, 0, 3, 'Серия-dy') RETURNING *",
                     (user_id,)
                 )
                 conn.commit()
@@ -85,7 +85,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             if not user:
                 cur.execute(
-                    "INSERT INTO users (user_id, balance) VALUES (%s, 4000) RETURNING balance",
+                    "INSERT INTO users (user_id, balance) VALUES (%s, 0) RETURNING balance",
                     (user_id,)
                 )
                 conn.commit()
