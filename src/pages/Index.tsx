@@ -26,19 +26,32 @@ const PAYMENT_METHODS = [
 ];
 
 const BALANCE_API = 'https://functions.poehali.dev/f94f1e9d-6e4d-4cb4-a2b2-2c71098604c4';
+const AUTH_API = 'https://functions.poehali.dev/2a2767d5-a238-4fab-b464-9602bceb46c4';
 
-const getUserId = () => {
-  let userId = localStorage.getItem('lucky_bear_user_id');
-  if (!userId) {
-    userId = 'user_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('lucky_bear_user_id', userId);
+const getUser = () => {
+  const userStr = localStorage.getItem('just_games_user');
+  if (userStr) {
+    try {
+      return JSON.parse(userStr);
+    } catch {
+      return null;
+    }
   }
-  return userId;
+  return null;
+};
+
+const setUser = (user: any) => {
+  localStorage.setItem('just_games_user', JSON.stringify(user));
+};
+
+const clearUser = () => {
+  localStorage.removeItem('just_games_user');
 };
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState('all');
-  const [currentPage, setCurrentPage] = useState('games');
+  const [currentPage, setCurrentPage] = useState('auth');
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [walletPage, setWalletPage] = useState('deposit');
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -51,13 +64,24 @@ export default function Index() {
   const [walletId, setWalletId] = useState('');
   const [applyBonus, setApplyBonus] = useState(true);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const userId = getUserId();
+  const [user, setUserState] = useState<any>(null);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [authError, setAuthError] = useState('');
 
   useEffect(() => {
-    loadBalance();
+    const savedUser = getUser();
+    if (savedUser) {
+      setUserState(savedUser);
+      setCurrentPage('games');
+      loadBalance(savedUser.user_id);
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  const loadBalance = async () => {
+  const loadBalance = async (userId: string) => {
     try {
       const response = await fetch(BALANCE_API, {
         headers: {
@@ -74,13 +98,62 @@ export default function Index() {
     }
   };
 
+  const handleAuth = async () => {
+    setAuthError('');
+    
+    if (!username || !password) {
+      setAuthError('Введите имя пользователя и пароль');
+      return;
+    }
+    
+    if (authMode === 'register') {
+      if (password !== confirmPassword) {
+        setAuthError('Пароли не совпадают');
+        return;
+      }
+      if (password.length < 6) {
+        setAuthError('Пароль должен быть не менее 6 символов');
+        return;
+      }
+    }
+    
+    try {
+      const response = await fetch(AUTH_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: authMode,
+          username,
+          password
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        setAuthError(data.error || 'Ошибка авторизации');
+        return;
+      }
+      
+      setUser(data.user);
+      setUserState(data.user);
+      setCurrentPage('games');
+      loadBalance(data.user.user_id);
+    } catch (error) {
+      setAuthError('Ошибка соединения с сервером');
+    }
+  };
+
   const updateBalance = async (amount: number, type: string, gameType: string, description: string) => {
+    if (!user) return;
     try {
       const response = await fetch(BALANCE_API, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-User-Id': userId
+          'X-User-Id': user.user_id
         },
         body: JSON.stringify({
           amount,
@@ -91,7 +164,7 @@ export default function Index() {
       });
       const data = await response.json();
       setBalance(data.balance);
-      await loadBalance();
+      await loadBalance(user.user_id);
     } catch (error) {
       console.error('Failed to update balance:', error);
     }
@@ -121,6 +194,85 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      {currentPage === 'auth' && (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 p-4">
+          <Card className="w-full max-w-md bg-card/95 backdrop-blur border-blue-500/30 p-8">
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <span className="text-4xl">🎮</span>
+              </div>
+              <h1 className="text-3xl font-bold text-blue-400 mb-1">JUST GAMES</h1>
+              <p className="text-sm text-muted-foreground">Лучшее онлайн казино</p>
+            </div>
+
+            <div className="flex gap-2 mb-6">
+              <Button
+                onClick={() => setAuthMode('login')}
+                className={`flex-1 ${authMode === 'login' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-secondary'}`}
+              >
+                Вход
+              </Button>
+              <Button
+                onClick={() => setAuthMode('register')}
+                className={`flex-1 ${authMode === 'register' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-secondary'}`}
+              >
+                Регистрация
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Имя пользователя</label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Введите имя"
+                  className="w-full px-4 py-3 bg-background border-2 border-border rounded-lg focus:border-blue-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">Пароль</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Введите пароль"
+                  className="w-full px-4 py-3 bg-background border-2 border-border rounded-lg focus:border-blue-500 outline-none"
+                />
+              </div>
+
+              {authMode === 'register' && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Повторите пароль</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Повторите пароль"
+                    className="w-full px-4 py-3 bg-background border-2 border-border rounded-lg focus:border-blue-500 outline-none"
+                  />
+                </div>
+              )}
+
+              {authError && (
+                <div className="bg-red-500/20 border border-red-500 rounded-lg p-3 text-sm text-red-400">
+                  {authError}
+                </div>
+              )}
+
+              <Button
+                onClick={handleAuth}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white py-4 rounded-xl text-lg font-bold"
+              >
+                {authMode === 'login' ? 'Войти' : 'Зарегистрироваться'}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
       {currentPage === 'games' && (
         <>
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border">
@@ -255,9 +407,9 @@ export default function Index() {
                 <Icon name="Star" size={64} className="text-white" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold mb-1">Серия-dy</h2>
+            <h2 className="text-2xl font-bold mb-1">{user?.nickname || user?.username || 'Игрок'}</h2>
             <div className="flex items-center justify-center gap-2 text-muted-foreground">
-              <span className="text-sm">UID:1704028377</span>
+              <span className="text-sm">UID:{user?.uid || '0000000000'}</span>
               <Icon name="Copy" size={14} />
             </div>
           </div>
@@ -1002,7 +1154,7 @@ export default function Index() {
                 <>
                   Пополнить баланс
                   <br />
-                  <span className="text-sm font-normal">Баланс пополнен на {(applyBonus ? Number(amount) * 4 : Number(amount)).toLocaleString()}{selectedPaymentMethod.type === 'crypto' ? 'USDT' : '₽'}</span>
+                  <span className="text-xs font-light text-white/90 opacity-90">Баланс пополнен на {(applyBonus ? Number(amount) * 4 : Number(amount)).toLocaleString()}{selectedPaymentMethod.type === 'crypto' ? 'USDT' : '₽'}</span>
                 </>
               ) : (
                 'Пополнить баланс'
