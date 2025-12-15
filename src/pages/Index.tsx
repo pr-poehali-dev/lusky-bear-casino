@@ -172,14 +172,14 @@ export default function Index() {
                   <span>Доступно для вывода</span>
                   <Icon name="HelpCircle" size={12} />
                 </div>
-                <div className="text-green-500 font-semibold">{balance}₽ ></div>
+                <div className="text-green-500 font-semibold">{balance}₽ {'>'}</div>
               </div>
               <div>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
                   <span>Сумма к разблокировке</span>
                   <Icon name="HelpCircle" size={12} />
                 </div>
-                <div className="text-primary font-semibold">0₽ ></div>
+                <div className="text-primary font-semibold">0₽ {'>'}</div>
               </div>
             </div>
 
