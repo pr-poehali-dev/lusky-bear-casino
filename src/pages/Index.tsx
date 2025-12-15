@@ -799,51 +799,54 @@ export default function Index() {
           </header>
 
           <div className="px-3 py-4">
-            <h3 className="font-semibold mb-3">Заплатите <span className="text-muted-foreground text-sm ml-2">Мин. сумма: {selectedPaymentMethod.type === 'crypto' ? `${selectedPaymentMethod.min}USDT` : `${selectedPaymentMethod.min}₽`}</span></h3>
+            <h3 className="font-semibold mb-1">Заплатите</h3>
+            <p className="text-sm text-muted-foreground mb-3">Мин. сумма: {selectedPaymentMethod.type === 'crypto' ? `${selectedPaymentMethod.min}USDT` : `${selectedPaymentMethod.min}₽`}</p>
 
             <div className="mb-4">
-              <div className="flex items-center gap-2 bg-card border-2 border-border rounded-lg p-4 mb-3">
+              <div className="flex items-center gap-3 bg-card border-2 border-border rounded-lg p-4 mb-3">
                 <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
                   <Icon name="Coins" size={20} className="text-white" />
                 </div>
-                <span className="text-sm text-muted-foreground mr-2">{selectedPaymentMethod.type === 'crypto' ? 'USDT' : 'RUB'}</span>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder={selectedPaymentMethod.type === 'crypto' ? '50' : '3077'}
-                  className="flex-1 bg-transparent text-3xl font-bold outline-none"
-                />
+                <div className="flex-1">
+                  <p className="text-xs text-muted-foreground mb-1">{selectedPaymentMethod.type === 'crypto' ? 'USDT' : 'RUB'}</p>
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder={selectedPaymentMethod.type === 'crypto' ? '50' : '3077'}
+                    className="w-full bg-transparent text-3xl font-bold outline-none"
+                  />
+                </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 mb-4">
+              <div className="grid grid-cols-3 gap-2 mb-2">
                 {selectedPaymentMethod.type === 'crypto' ? (
                   <>
-                    <button onClick={() => setAmount('10')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
-                      <p className="font-bold">10USDT</p>
+                    <button onClick={() => setAmount('10')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-2.5 transition-colors">
+                      <p className="font-bold text-sm">10USDT</p>
                       <p className="text-xs text-green-500">+12USDT</p>
                     </button>
-                    <button onClick={() => setAmount('50')} className="bg-green-600/20 border-2 border-green-600 hover:bg-green-600/30 rounded-lg p-3 transition-colors">
-                      <p className="font-bold">50USDT</p>
+                    <button onClick={() => setAmount('50')} className="bg-green-600/20 border-2 border-green-600 hover:bg-green-600/30 rounded-lg p-2.5 transition-colors">
+                      <p className="font-bold text-sm">50USDT</p>
                       <p className="text-xs text-green-500">+150USDT</p>
                     </button>
-                    <button onClick={() => setAmount('100')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
-                      <p className="font-bold">100USDT</p>
+                    <button onClick={() => setAmount('100')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-2.5 transition-colors">
+                      <p className="font-bold text-sm">100USDT</p>
                       <p className="text-xs text-green-500">+300USDT</p>
                     </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={() => setAmount('2077')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
-                      <p className="font-bold">2 077₽</p>
+                    <button onClick={() => setAmount('2077')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-2.5 transition-colors">
+                      <p className="font-bold text-sm">2 077₽</p>
                       <p className="text-xs text-green-500">+4 984₽</p>
                     </button>
-                    <button onClick={() => setAmount('3077')} className="bg-green-600/20 border-2 border-green-600 hover:bg-green-600/30 rounded-lg p-3 transition-colors">
-                      <p className="font-bold">3 077₽</p>
+                    <button onClick={() => setAmount('3077')} className="bg-green-600/20 border-2 border-green-600 hover:bg-green-600/30 rounded-lg p-2.5 transition-colors">
+                      <p className="font-bold text-sm">3 077₽</p>
                       <p className="text-xs text-green-500">+9 231₽</p>
                     </button>
-                    <button onClick={() => setAmount('5077')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
-                      <p className="font-bold">5 077₽</p>
+                    <button onClick={() => setAmount('5077')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-2.5 transition-colors">
+                      <p className="font-bold text-sm">5 077₽</p>
                       <p className="text-xs text-green-500">+15 231₽</p>
                     </button>
                   </>
@@ -853,31 +856,31 @@ export default function Index() {
               <div className="grid grid-cols-3 gap-2">
                 {selectedPaymentMethod.type === 'crypto' ? (
                   <>
-                    <button onClick={() => setAmount('500')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
-                      <p className="font-bold">500USDT</p>
+                    <button onClick={() => setAmount('500')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-2.5 transition-colors">
+                      <p className="font-bold text-sm">500USDT</p>
                       <p className="text-xs text-green-500">+1 800USDT</p>
                     </button>
-                    <button onClick={() => setAmount('1000')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
-                      <p className="font-bold">1 000USDT</p>
+                    <button onClick={() => setAmount('1000')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-2.5 transition-colors">
+                      <p className="font-bold text-sm">1 000USDT</p>
                       <p className="text-xs text-green-500">+3 600USDT</p>
                     </button>
-                    <button onClick={() => setAmount('5000')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
-                      <p className="font-bold">5 000USDT</p>
+                    <button onClick={() => setAmount('5000')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-2.5 transition-colors">
+                      <p className="font-bold text-sm">5 000USDT</p>
                       <p className="text-xs text-green-500">+18 000USDT</p>
                     </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={() => setAmount('8077')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
-                      <p className="font-bold">8 077₽</p>
+                    <button onClick={() => setAmount('8077')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-2.5 transition-colors">
+                      <p className="font-bold text-sm">8 077₽</p>
                       <p className="text-xs text-green-500">+24 231₽</p>
                     </button>
-                    <button onClick={() => setAmount('10077')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
-                      <p className="font-bold">10 077₽</p>
+                    <button onClick={() => setAmount('10077')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-2.5 transition-colors">
+                      <p className="font-bold text-sm">10 077₽</p>
                       <p className="text-xs text-green-500">+34 261₽</p>
                     </button>
-                    <button onClick={() => setAmount('20000')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-3 transition-colors">
-                      <p className="font-bold">20 000₽</p>
+                    <button onClick={() => setAmount('20000')} className="bg-secondary hover:bg-secondary/80 rounded-lg p-2.5 transition-colors">
+                      <p className="font-bold text-sm">20 000₽</p>
                       <p className="text-xs text-green-500">+72 000₽</p>
                     </button>
                   </>
@@ -993,13 +996,16 @@ export default function Index() {
                 setWalletId('');
                 setSelectedPaymentMethod(null);
               }}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-5 rounded-2xl text-lg font-bold"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-5 rounded-2xl text-base font-bold"
             >
-              Пополнить баланс
-              {amount && (
-                <span className="ml-2">
-                  Баланс пополнен на {applyBonus ? Number(amount) * 4 : amount}{selectedPaymentMethod.type === 'crypto' ? 'USDT' : '₽'}
-                </span>
+              {amount ? (
+                <>
+                  Пополнить баланс
+                  <br />
+                  <span className="text-sm font-normal">Баланс пополнен на {(applyBonus ? Number(amount) * 4 : Number(amount)).toLocaleString()}{selectedPaymentMethod.type === 'crypto' ? 'USDT' : '₽'}</span>
+                </>
+              ) : (
+                'Пополнить баланс'
               )}
             </Button>
           </div>
