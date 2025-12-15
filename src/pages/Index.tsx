@@ -244,12 +244,9 @@ export default function Index() {
           </div>
 
           <div className="text-center mb-8">
-            <div className="inline-block relative mb-4">
+            <div className="inline-block mb-4">
               <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary via-blue-400 to-cyan-400 flex items-center justify-center shadow-2xl shadow-primary/50">
                 <Icon name="Star" size={64} className="text-white" />
-              </div>
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-background border-2 border-primary rounded-full px-4 py-1">
-                <span className="text-3xl font-bold">LV.3</span>
               </div>
             </div>
             <h2 className="text-2xl font-bold mb-1">Серия-dy</h2>
@@ -257,9 +254,6 @@ export default function Index() {
               <span className="text-sm">UID:1704028377</span>
               <Icon name="Copy" size={14} />
             </div>
-            <Button className="mt-4 bg-accent hover:bg-accent/90 text-accent-foreground rounded-full px-6">
-              Посмотреть привилегии
-            </Button>
           </div>
 
           <Card className="bg-card border-border p-5 mb-6">
