@@ -39,6 +39,7 @@ const getUserId = () => {
 export default function Index() {
   const [activeTab, setActiveTab] = useState('all');
   const [currentPage, setCurrentPage] = useState('games');
+  const [walletPage, setWalletPage] = useState('deposit');
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showDepositModal, setShowDepositModal] = useState(false);
@@ -265,36 +266,34 @@ export default function Index() {
                 <span className="text-3xl font-bold">{balance}</span>
               </div>
               <button 
-                onClick={() => setCurrentPage('games')}
+                onClick={() => setCurrentPage('bet-history')}
                 className="text-primary text-sm hover:underline"
               >
                 История ставок
               </button>
             </div>
             
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => setCurrentPage('withdrawal')}
+                className="text-left"
+              >
                 <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
                   <span>Доступно для вывода</span>
                   <Icon name="HelpCircle" size={12} />
                 </div>
                 <div className="text-green-500 font-semibold">{balance}₽ {'>'}</div>
-              </div>
-              <div>
+              </button>
+              <button
+                onClick={() => setCurrentPage('bonus-history')}
+                className="text-left"
+              >
                 <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
-                  <span>Сумма к разблокировке</span>
+                  <span>Бонусный счёт</span>
                   <Icon name="HelpCircle" size={12} />
                 </div>
                 <div className="text-primary font-semibold">0₽ {'>'}</div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between bg-secondary rounded-lg p-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Icon name="HelpCircle" size={16} />
-                <span>Остаток средств: 0₽</span>
-              </div>
-              <Icon name="ChevronRight" size={18} className="text-muted-foreground" />
+              </button>
             </div>
           </Card>
 
@@ -335,6 +334,400 @@ export default function Index() {
         </div>
       )}
 
+      {currentPage === 'bet-history' && (
+        <div className="px-3 py-6 max-w-screen-xl mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <button onClick={() => setCurrentPage('profile')} className="p-2">
+              <Icon name="ArrowLeft" size={24} />
+            </button>
+            <h1 className="text-2xl font-bold">История ставок</h1>
+          </div>
+
+          <div className="space-y-3">
+            {transactions.filter(t => t.transaction_type === 'bet' || t.transaction_type === 'win').map((tx: any) => (
+              <Card key={tx.id} className="bg-card border-border p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      tx.transaction_type === 'win' ? 'bg-green-500/20' : 'bg-red-500/20'
+                    }`}>
+                      <Icon 
+                        name={tx.transaction_type === 'win' ? 'TrendingUp' : 'TrendingDown'} 
+                        size={24}
+                        className={tx.transaction_type === 'win' ? 'text-green-500' : 'text-red-500'}
+                      />
+                    </div>
+                    <div>
+                      <p className="font-semibold">{tx.description}</p>
+                      <p className="text-sm text-muted-foreground">{tx.game_type}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(tx.created_at).toLocaleString('ru-RU')}</p>
+                    </div>
+                  </div>
+                  <span className={`text-lg font-bold ${
+                    tx.amount > 0 ? 'text-green-500' : 'text-red-500'
+                  }`}>
+                    {tx.amount > 0 ? '+' : ''}{tx.amount}₽
+                  </span>
+                </div>
+              </Card>
+            ))}
+            {transactions.filter(t => t.transaction_type === 'bet' || t.transaction_type === 'win').length === 0 && (
+              <div className="text-center py-12 text-muted-foreground">
+                <Icon name="History" size={48} className="mx-auto mb-3 opacity-50" />
+                <p>История ставок пуста</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {currentPage === 'withdrawal' && (
+        <div className="px-3 py-6 max-w-screen-xl mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <button onClick={() => setCurrentPage('profile')} className="p-2">
+              <Icon name="ArrowLeft" size={24} />
+            </button>
+            <h1 className="text-2xl font-bold">Вывод средств</h1>
+          </div>
+
+          <Card className="bg-card border-border p-5 mb-6">
+            <div className="text-center mb-4">
+              <p className="text-sm text-muted-foreground mb-2">Доступно для вывода</p>
+              <p className="text-4xl font-bold text-green-500">{balance}₽</p>
+            </div>
+            <div className="bg-secondary rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">Основной счёт</span>
+                <span className="font-semibold">{balance}₽</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Заблокировано</span>
+                <span className="font-semibold">0₽</span>
+              </div>
+            </div>
+          </Card>
+
+          <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-6 rounded-2xl text-lg font-semibold mb-4">
+            <Icon name="ArrowUpRight" size={24} className="mr-2" />
+            Вывести средства
+          </Button>
+
+          <p className="text-xs text-center text-muted-foreground">
+            Минимальная сумма вывода: 100₽
+          </p>
+        </div>
+      )}
+
+      {currentPage === 'bonus-history' && (
+        <div className="px-3 py-6 max-w-screen-xl mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <button onClick={() => setCurrentPage('profile')} className="p-2">
+              <Icon name="ArrowLeft" size={24} />
+            </button>
+            <h1 className="text-2xl font-bold">Бонусный счёт</h1>
+          </div>
+
+          <Card className="bg-gradient-to-br from-primary/20 to-accent/20 border-primary/30 p-6 mb-6">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-2">Текущий бонусный баланс</p>
+              <p className="text-4xl font-bold text-accent">0₽</p>
+              <p className="text-xs text-muted-foreground mt-2">Активируйте бонусы при пополнении</p>
+            </div>
+          </Card>
+
+          <h3 className="font-semibold mb-3">История бонусов</h3>
+          <div className="space-y-3">
+            {transactions.filter(t => t.description.includes('бонус') || t.description.includes('Бонус')).map((tx: any) => (
+              <Card key={tx.id} className="bg-card border-border p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center">
+                      <Icon name="Gift" size={24} className="text-accent" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">{tx.description}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(tx.created_at).toLocaleString('ru-RU')}</p>
+                    </div>
+                  </div>
+                  <span className="text-lg font-bold text-accent">+{tx.amount}₽</span>
+                </div>
+              </Card>
+            ))}
+            {transactions.filter(t => t.description.includes('бонус') || t.description.includes('Бонус')).length === 0 && (
+              <div className="text-center py-12 text-muted-foreground">
+                <Icon name="Gift" size={48} className="mx-auto mb-3 opacity-50" />
+                <p>У вас пока нет бонусов</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {currentPage === 'wallet' && (
+        <div className="min-h-screen bg-background pb-20">
+          <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
+            <div className="px-3 py-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
+                    <Icon name="Coins" size={24} className="text-white" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{balance}</p>
+                    <p className="text-xs text-muted-foreground">Основной баланс</p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => setShowDepositModal(true)}
+                  className="bg-primary hover:bg-primary/90 rounded-full"
+                >
+                  <Icon name="Wallet" size={18} className="mr-1.5" />
+                  Пополнить
+                </Button>
+              </div>
+              <div className="flex gap-2 border-b border-border">
+                <button
+                  onClick={() => setWalletPage('deposit')}
+                  className={`flex-1 pb-3 text-sm font-medium border-b-2 transition-colors ${
+                    walletPage === 'deposit' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'
+                  }`}
+                >
+                  Пополнить
+                </button>
+                <button
+                  onClick={() => setWalletPage('withdraw')}
+                  className={`flex-1 pb-3 text-sm font-medium border-b-2 transition-colors ${
+                    walletPage === 'withdraw' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'
+                  }`}
+                >
+                  Вывести
+                </button>
+                <button
+                  onClick={() => setWalletPage('history')}
+                  className={`flex-1 pb-3 text-sm font-medium border-b-2 transition-colors ${
+                    walletPage === 'history' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'
+                  }`}
+                >
+                  История
+                  <Icon name="Clock" size={16} className="inline ml-1" />
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <div className="px-3 py-4">
+            {walletPage === 'deposit' && (
+              <div>
+                <Card className="bg-gradient-to-r from-primary/20 to-accent/20 border-primary/30 p-4 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="text-4xl">🎁</div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">🔥Выберите способ пополнения и получите до</p>
+                      <p className="text-2xl font-bold">360% +250FS</p>
+                    </div>
+                    <Icon name="ChevronRight" size={24} className="text-accent" />
+                  </div>
+                </Card>
+
+                <h3 className="font-semibold mb-3">Выберите способ оплаты</h3>
+                <div className="mb-4">
+                  <div className="flex items-center justify-between bg-card border border-border rounded-lg p-3 mb-2">
+                    <span className="text-sm">🇷🇺 RUB</span>
+                    <Icon name="ChevronDown" size={18} />
+                  </div>
+                </div>
+
+                <div className="bg-card border-l-4 border-primary rounded-lg p-4 mb-4">
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <div className="w-1 h-5 bg-primary"></div>
+                    Оплатить в рублях
+                  </h4>
+                  <div className="space-y-2">
+                    {[
+                      { icon: '✓', name: 'Перевод со Сбербанка', range: 'От 1 077₽ до 300 000₽', badge: 'HOT' },
+                      { icon: '🏦', name: 'Перевод с Т-банка', range: 'От 1 077₽ до 300 000₽' },
+                      { icon: '🅰️', name: 'Перевод с Альфа-банка', range: 'От 1 077₽ до 300 000₽' },
+                      { icon: '💳', name: 'Перевод через ВТБ', range: 'От 1 077₽ до 300 000₽' },
+                      { icon: '📱', name: 'Перевод по номеру', range: 'От 2 077₽ до 300 000₽' },
+                      { icon: '💳', name: 'Перевод по номеру карты', range: 'От 3 077₽ до 300 000₽' },
+                    ].map((method, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setShowDepositModal(true)}
+                        className="w-full flex items-center gap-3 bg-secondary/50 hover:bg-secondary rounded-lg p-3 transition-colors relative"
+                      >
+                        {method.badge && (
+                          <span className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">
+                            {method.badge}
+                          </span>
+                        )}
+                        <div className="w-12 h-12 bg-card rounded-lg flex items-center justify-center text-2xl">
+                          {method.icon}
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className="font-semibold text-sm">{method.name}</p>
+                          <p className="text-xs text-muted-foreground">{method.range}</p>
+                        </div>
+                        <Icon name="ChevronRight" size={20} className="text-muted-foreground" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-card border-l-4 border-primary rounded-lg p-4">
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <div className="w-1 h-5 bg-primary"></div>
+                    Криптовалютный платеж
+                  </h4>
+                  <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
+                    <Icon name="ThumbsUp" size={14} />
+                    Мгновенное зачисление, без комиссии!
+                  </p>
+                  <div className="space-y-2">
+                    {[
+                      { icon: '📱', name: '@CryptoBot', range: 'От 20USDT до 2 000USDT' },
+                      { icon: '💎', name: 'USDT (TON)', range: 'От 20USDT до 2 000USDT', badge: 'FREE' },
+                    ].map((method, idx) => (
+                      <button
+                        key={idx}
+                        className="w-full flex items-center gap-3 bg-secondary/50 hover:bg-secondary rounded-lg p-3 transition-colors relative"
+                      >
+                        {method.badge && (
+                          <span className="absolute top-2 left-2 bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded">
+                            {method.badge}
+                          </span>
+                        )}
+                        <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center text-2xl">
+                          {method.icon}
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className="font-semibold text-sm">{method.name}</p>
+                          <p className="text-xs text-muted-foreground">{method.range}</p>
+                        </div>
+                        <Icon name="ChevronRight" size={20} className="text-muted-foreground" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {walletPage === 'withdraw' && (
+              <div>
+                <Card className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-blue-500/30 p-4 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="text-4xl">💰</div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">Специальная акция с реальным призовым фондом:</p>
+                      <p className="text-lg font-bold">чем больше баланс, тем выше шанс выигрыша!</p>
+                    </div>
+                    <Icon name="ChevronRight" size={24} className="text-blue-400" />
+                  </div>
+                </Card>
+
+                <h3 className="text-lg font-semibold mb-3">Пожалуйста, выберите способ оплаты</h3>
+                
+                <div className="bg-card border-l-4 border-primary rounded-lg p-4 mb-4">
+                  <h4 className="font-semibold mb-3">Оплатить в рублях</h4>
+                  <div className="space-y-2">
+                    {[
+                      { icon: '📱', name: 'Перевод по номеру', range: 'От 2 200₽ до 200 000₽', badge: 'HOT' },
+                      { icon: '💳', name: 'Перевод по номеру карты', range: 'От 3 300₽ до 200 000₽' },
+                      { icon: '🎨', name: 'piastrix', range: 'От 2 200₽ до 100 000₽' },
+                    ].map((method, idx) => (
+                      <button
+                        key={idx}
+                        className="w-full flex items-center gap-3 bg-secondary/50 hover:bg-secondary rounded-lg p-3 transition-colors relative"
+                      >
+                        {method.badge && (
+                          <span className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">
+                            {method.badge}
+                          </span>
+                        )}
+                        <div className="w-12 h-12 bg-card rounded-lg flex items-center justify-center text-2xl">
+                          {method.icon}
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className="font-semibold text-sm">{method.name}</p>
+                          <p className="text-xs text-muted-foreground">{method.range}</p>
+                        </div>
+                        <Icon name="ChevronRight" size={20} className="text-muted-foreground" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-card border-l-4 border-primary rounded-lg p-4">
+                  <h4 className="font-semibold mb-3">Криптовалютный платеж</h4>
+                  <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
+                    <Icon name="ThumbsUp" size={14} />
+                    Мгновенное зачисление, без комиссии!
+                  </p>
+                  <div className="space-y-2">
+                    {[
+                      { icon: '📱', name: '@CryptoBot', range: 'От 20USDT до 2 000USDT' },
+                      { icon: '💎', name: 'USDT (TON)', range: 'От 20USDT до 2 000USDT' },
+                    ].map((method, idx) => (
+                      <button
+                        key={idx}
+                        className="w-full flex items-center gap-3 bg-secondary/50 hover:bg-secondary rounded-lg p-3 transition-colors"
+                      >
+                        <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center text-2xl">
+                          {method.icon}
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className="font-semibold text-sm">{method.name}</p>
+                          <p className="text-xs text-muted-foreground">{method.range}</p>
+                        </div>
+                        <Icon name="ChevronRight" size={20} className="text-muted-foreground" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {walletPage === 'history' && (
+              <div className="space-y-3">
+                {transactions.slice(0, 20).map((tx: any) => (
+                  <Card key={tx.id} className="bg-card border-border p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                          tx.transaction_type === 'win' ? 'bg-green-500/20' :
+                          tx.transaction_type === 'deposit' ? 'bg-primary/20' : 'bg-red-500/20'
+                        }`}>
+                          <Icon 
+                            name={tx.transaction_type === 'win' ? 'TrendingUp' : tx.transaction_type === 'deposit' ? 'Wallet' : 'TrendingDown'} 
+                            size={24}
+                            className={tx.transaction_type === 'win' ? 'text-green-500' : tx.transaction_type === 'deposit' ? 'text-primary' : 'text-red-500'}
+                          />
+                        </div>
+                        <div>
+                          <p className="font-semibold">{tx.description}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(tx.created_at).toLocaleString('ru-RU')}</p>
+                        </div>
+                      </div>
+                      <span className={`text-lg font-bold ${
+                        tx.amount > 0 ? 'text-green-500' : 'text-red-500'
+                      }`}>
+                        {tx.amount > 0 ? '+' : ''}{tx.amount}₽
+                      </span>
+                    </div>
+                  </Card>
+                ))}
+                {transactions.length === 0 && (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Icon name="History" size={48} className="mx-auto mb-3 opacity-50" />
+                    <p>История транзакций пуста</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur border-t border-border z-50">
         <div className="flex items-center justify-around py-2 px-2 max-w-screen-xl mx-auto">
           <button 
@@ -353,11 +746,11 @@ export default function Index() {
             <span className="text-[10px]">Бонусы</span>
           </button>
           <button 
-            onClick={() => setShowDepositModal(true)}
-            className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-foreground min-w-0 flex-1"
+            onClick={() => setCurrentPage('wallet')}
+            className={`flex flex-col items-center gap-0.5 min-w-0 flex-1 ${currentPage === 'wallet' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
           >
             <Icon name="Wallet" size={22} />
-            <span className="text-[10px]">Счёт</span>
+            <span className="text-[10px]">Пополнить</span>
           </button>
           <button 
             onClick={() => setCurrentPage('profile')}
